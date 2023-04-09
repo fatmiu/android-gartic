@@ -57,12 +57,6 @@ class UsernameFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.setupEvent.collect { event ->
                     when (event) {
-                        is SetupViewModel.SetupEvent.CreateRoomErrorEvent -> TODO()
-                        is SetupViewModel.SetupEvent.CreateRoomEvent -> TODO()
-                        SetupViewModel.SetupEvent.GetRoomEmptyEvent -> TODO()
-                        is SetupViewModel.SetupEvent.GetRoomErrorEvent -> TODO()
-                        is SetupViewModel.SetupEvent.GetRoomEvent -> TODO()
-                        SetupViewModel.SetupEvent.GetRoomLoadingEvent -> TODO()
                         SetupViewModel.SetupEvent.InputEmptyError -> {
                             snackbar(R.string.error_field_empty)
                         }
@@ -85,14 +79,14 @@ class UsernameFragment : Fragment() {
                             )
                         }
 
-                        is SetupViewModel.SetupEvent.JoinRoomErrorEvent -> TODO()
-                        is SetupViewModel.SetupEvent.JoinRoomEvent -> TODO()
                         is SetupViewModel.SetupEvent.NavigateToSelectRoomEvent -> {
                             findNavController().navigateSafely(
                                 R.id.action_usernameFragment_to_selectRoomFragment,
                                 args = Bundle().apply { putString("username", event.username) }
                             )
                         }
+
+                        else -> Unit
                     }
                 }
             }

@@ -11,12 +11,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class RoomAdapter @Inject constructor() : RecyclerView.Adapter<RoomAdapter.RoomViewHolder>() {
+class RoomAdapter @Inject constructor () : RecyclerView.Adapter<RoomAdapter.RoomViewHolder>() {
 
     class RoomViewHolder(val binding: ItemRoomBinding) : ViewHolder(binding.root)
 
     suspend fun updateDataset(newDataset: List<Room>) = withContext(Dispatchers.Default) {
-        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback(){
+        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize(): Int {
                 return rooms.size
             }

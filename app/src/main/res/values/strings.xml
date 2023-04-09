@@ -16,4 +16,9 @@
     <string name="next">Next</string>
 
     <string name="username">Username</string>
+
+    <string name="search_for_rooms">Search for rooms…</string>
+    <string name="no_rooms_found">No Rooms Found</string>
+    <string name="or">or</string>
+    <string name="create_room">Create Room</string>
 </resources>
