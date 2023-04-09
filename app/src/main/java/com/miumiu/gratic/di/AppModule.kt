@@ -1,5 +1,6 @@
 package com.miumiu.gratic.di
 
+import android.content.Context
 import com.google.gson.Gson
 import com.miumiu.gratic.data.remote.api.SetupApi
 import com.miumiu.gratic.util.Constants.HTTP_BASE_URL
@@ -9,6 +10,7 @@ import com.miumiu.gratic.util.DispatcherProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +44,10 @@ object AppModule {
             .build()
             .create(SetupApi::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideApplicationContext(@ApplicationContext context: Context) = context
 
     @Singleton
     @Provides
