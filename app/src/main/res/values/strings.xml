@@ -4,7 +4,16 @@
 
     <string name="check_internet_connection">Couldn\'t reach server. Check your internet connection.</string>
 
+    <string name="choose_a_username">Choose a username</string>
+
+    <string name="error_field_empty">The fields may not be empty</string>
     <string name="error_http">Something went wrong. Please try again later.</string>
     <string name="error_internet_turned_off">This app requires an active internet connection to be used.</string>
     <string name="error_unknown">Unknown Error</string>
+    <string name="error_username_too_long">The maximum username length is %d.</string>
+    <string name="error_username_too_short">The minimum username length is %d characters.</string>
+
+    <string name="next">Next</string>
+
+    <string name="username">Username</string>
 </resources>

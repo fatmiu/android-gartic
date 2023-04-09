@@ -3,6 +3,8 @@ package com.miumiu.gratic.di
 import android.content.Context
 import com.google.gson.Gson
 import com.miumiu.gratic.data.remote.api.SetupApi
+import com.miumiu.gratic.repository.DefaultSetupRepository
+import com.miumiu.gratic.repository.SetupRepository
 import com.miumiu.gratic.util.Constants.HTTP_BASE_URL
 import com.miumiu.gratic.util.Constants.HTTP_BASE_URL_LOCALHOST
 import com.miumiu.gratic.util.Constants.USE_LOCALHOST
@@ -23,6 +25,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Singleton
+    @Provides
+    fun provideSetupRepository(
+        setupApi: SetupApi,
+        @ApplicationContext context: Context
+    ): SetupRepository = DefaultSetupRepository(setupApi, context)
 
     @Singleton
     @Provides
