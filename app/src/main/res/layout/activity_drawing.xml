@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
+        <com.miumiu.gratic.ui.views.DrawingView
             android:id="@+id/drawingView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -21,69 +21,95 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <RadioGroup
-            android:id="@+id/colorGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:orientation="horizontal"
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="16dp"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toStartOf="@+id/ibUndo"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/drawingView">
+            app:layout_constraintTop_toTopOf="parent">
 
-            <com.miumiu.gratic.ui.views.ColorRadioButton
-                android:id="@+id/rbRed"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:buttonColor="@color/red"/>
-
-            <com.miumiu.gratic.ui.views.ColorRadioButton
-                android:id="@+id/rbGreen"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:buttonColor="@color/orange"/>
-
-            <com.miumiu.gratic.ui.views.ColorRadioButton
-                android:id="@+id/rbBlue"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:buttonColor="@color/yellow"/>
-
-            <com.miumiu.gratic.ui.views.ColorRadioButton
-                android:id="@+id/rbOrange"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:buttonColor="@color/green"/>
-
-            <com.miumiu.gratic.ui.views.ColorRadioButton
-                android:id="@+id/rbYellow"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:buttonColor="@color/cyan"/>
-
-            <com.miumiu.gratic.ui.views.ColorRadioButton
-                android:id="@+id/rbBlack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:checked="true"
-                app:buttonColor="@color/black"/>
-
-            <com.miumiu.gratic.ui.views.ImageRadioButton
-                android:id="@+id/rbEraser"
+            <RadioGroup
+                android:id="@+id/colorGroup"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:padding="6dp"
-                app:uncheckedDrawable="@drawable/ic_uncheck_eraser"
-                app:checkedDrawable="@drawable/ic_check_eraser"/>
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/drawingView">
 
-        </RadioGroup>
+                <com.miumiu.gratic.ui.views.ColorRadioButton
+                    android:id="@+id/rbRed"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:buttonColor="@color/red" />
+
+                <com.miumiu.gratic.ui.views.ColorRadioButton
+                    android:id="@+id/rbOrange"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:buttonColor="@color/orange" />
+
+                <com.miumiu.gratic.ui.views.ColorRadioButton
+                    android:id="@+id/rbYellow"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:buttonColor="@color/yellow" />
+
+                <com.miumiu.gratic.ui.views.ColorRadioButton
+                    android:id="@+id/rbGreen"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:buttonColor="@color/green" />
+
+                <com.miumiu.gratic.ui.views.ColorRadioButton
+                    android:id="@+id/rbCyan"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:buttonColor="@color/cyan" />
+
+                <com.miumiu.gratic.ui.views.ColorRadioButton
+                    android:id="@+id/rbBlue"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:buttonColor="@color/blue" />
+
+                <com.miumiu.gratic.ui.views.ColorRadioButton
+                    android:id="@+id/rbPurple"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:buttonColor="@color/purple" />
+
+                <com.miumiu.gratic.ui.views.ColorRadioButton
+                    android:id="@+id/rbBlack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:checked="true"
+                    app:buttonColor="@color/black" />
+
+                <com.miumiu.gratic.ui.views.ImageRadioButton
+                    android:id="@+id/rbEraser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:padding="6dp"
+                    app:checkedDrawable="@drawable/ic_check_eraser"
+                    app:uncheckedDrawable="@drawable/ic_uncheck_eraser" />
+
+            </RadioGroup>
+
+        </HorizontalScrollView>
 
         <ImageButton
             android:id="@+id/ibUndo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
             android:background="@android:color/transparent"
-            app:layout_constraintBottom_toBottomOf="@id/colorGroup"
-            app:layout_constraintStart_toEndOf="@+id/colorGroup"
-            app:layout_constraintTop_toTopOf="@+id/colorGroup"
+            app:layout_constraintBottom_toBottomOf="@+id/horizontalScrollView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_undo" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator

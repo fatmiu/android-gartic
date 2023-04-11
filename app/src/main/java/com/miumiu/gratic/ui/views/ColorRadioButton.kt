@@ -36,7 +36,7 @@ class ColorRadioButton @JvmOverloads constructor(
                 style = Paint.Style.FILL
             }
             selectionPaint.apply {
-                color = Color.BLACK
+                color = buttonColor
                 style = Paint.Style.STROKE
                 strokeWidth = 12f
             }
