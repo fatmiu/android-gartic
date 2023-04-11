@@ -5,6 +5,7 @@
     <string name="check_internet_connection">Couldn\'t reach server. Check your internet connection.</string>
 
     <string name="choose_a_username">Choose a username</string>
+    <string name="choose_your_word">You are next, choose your word!</string>
 
     <string name="create_a_new_room">Create a New Room</string>
     <string name="create_room">Create Room</string>
