@@ -1,4 +1,4 @@
-package com.miumiu.gratic.ui.setup.fragment
+package com.miumiu.gratic.ui.select_room
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -16,8 +16,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.miumiu.gratic.R
 import com.miumiu.gratic.databinding.FragmentSelectRoomBinding
-import com.miumiu.gratic.ui.setup.SetupViewModel
-import com.miumiu.gratic.ui.setup.adapters.RoomAdapter
+import com.miumiu.gratic.ui.select_room.adapters.RoomAdapter
 import com.miumiu.gratic.util.Constants.SEARCH_DELAY
 import com.miumiu.gratic.util.navigateSafely
 import com.miumiu.gratic.util.snackbar
@@ -34,12 +33,14 @@ class SelectRoomFragment : Fragment() {
     private val binding: FragmentSelectRoomBinding
         get() = _binding!!
 
-    private val viewModel: SetupViewModel by activityViewModels()
+    private val viewModel: SelectRoomViewModel by viewModels()
 
     private val args: SelectRoomFragmentArgs by navArgs()
 
     @Inject
     lateinit var roomAdapter: RoomAdapter
+
+    private var updateRoomsJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,9 +88,9 @@ class SelectRoomFragment : Fragment() {
 
     private fun listenToEvents() = lifecycleScope.launch {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.setupEvent.collect { event ->
+            viewModel.event.collect { event ->
                 when (event) {
-                    is SetupViewModel.SetupEvent.JoinRoomEvent -> {
+                    is SelectRoomViewModel.Event.JoinRoomEvent -> {
                         findNavController().navigateSafely(
                             R.id.action_selectRoomFragment_to_drawingActivity,
                             args = Bundle().apply {
@@ -99,11 +100,11 @@ class SelectRoomFragment : Fragment() {
                         )
                     }
 
-                    is SetupViewModel.SetupEvent.JoinRoomErrorEvent -> {
+                    is SelectRoomViewModel.Event.JoinRoomErrorEvent -> {
                         snackbar(event.error)
                     }
 
-                    is SetupViewModel.SetupEvent.GetRoomErrorEvent -> {
+                    is SelectRoomViewModel.Event.GetRoomErrorEvent -> {
                         binding.apply {
                             roomsProgressBar.isVisible = false
                             tvNoRoomsFound.isVisible = false
@@ -122,15 +123,17 @@ class SelectRoomFragment : Fragment() {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.rooms.collect { event ->
                 when (event) {
-                    is SetupViewModel.SetupEvent.GetRoomLoadingEvent -> {
+                    is SelectRoomViewModel.Event.GetRoomLoadingEvent -> {
                         binding.roomsProgressBar.isVisible = true
                     }
 
-                    is SetupViewModel.SetupEvent.GetRoomEvent -> {
+                    is SelectRoomViewModel.Event.GetRoomEvent -> {
                         binding.roomsProgressBar.isVisible = false
                         val isRoomsEmpty = event.rooms.isEmpty()
                         binding.tvNoRoomsFound.isVisible = isRoomsEmpty
-                        lifecycleScope.launch {
+
+                        updateRoomsJob?.cancel()
+                        updateRoomsJob = lifecycleScope.launch {
                             roomAdapter.updateDataset(event.rooms)
                         }
                     }

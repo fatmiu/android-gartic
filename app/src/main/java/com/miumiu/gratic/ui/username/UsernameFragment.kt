@@ -1,18 +1,17 @@
-package com.miumiu.gratic.ui.setup.fragment
+package com.miumiu.gratic.ui.username
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.miumiu.gratic.R
 import com.miumiu.gratic.databinding.FragmentUsernameBinding
-import com.miumiu.gratic.ui.setup.SetupViewModel
 import com.miumiu.gratic.util.Constants.MAX_USERNAME_LENGTH
 import com.miumiu.gratic.util.Constants.MIN_USERNAME_LENGTH
 import com.miumiu.gratic.util.navigateSafely
@@ -27,7 +26,7 @@ class UsernameFragment : Fragment() {
     private val binding: FragmentUsernameBinding
         get() = _binding!!
 
-    private val viewModel: SetupViewModel by activityViewModels()
+    private val viewModel: UsernameViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,13 +54,13 @@ class UsernameFragment : Fragment() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.setupEvent.collect { event ->
+                viewModel.event.collect { event ->
                     when (event) {
-                        SetupViewModel.SetupEvent.InputEmptyError -> {
+                        UsernameViewModel.Event.InputEmptyError -> {
                             snackbar(R.string.error_field_empty)
                         }
 
-                        SetupViewModel.SetupEvent.InputTooLongError -> {
+                        UsernameViewModel.Event.InputTooLongError -> {
                             snackbar(
                                 getString(
                                     R.string.error_username_too_long,
@@ -70,7 +69,7 @@ class UsernameFragment : Fragment() {
                             )
                         }
 
-                        SetupViewModel.SetupEvent.InputTooShortError -> {
+                        UsernameViewModel.Event.InputTooShortError -> {
                             snackbar(
                                 getString(
                                     R.string.error_username_too_short,
@@ -79,7 +78,7 @@ class UsernameFragment : Fragment() {
                             )
                         }
 
-                        is SetupViewModel.SetupEvent.NavigateToSelectRoomEvent -> {
+                        is UsernameViewModel.Event.NavigateToSelectRoomEvent -> {
                             findNavController().navigateSafely(
                                 R.id.action_usernameFragment_to_selectRoomFragment,
                                 args = Bundle().apply { putString("username", event.username) }
