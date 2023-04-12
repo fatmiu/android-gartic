@@ -1,16 +1,27 @@
 package com.miumiu.gratic.di
 
+import android.app.Application
 import android.content.Context
 import com.google.gson.Gson
 import com.miumiu.gratic.data.remote.api.SetupApi
+import com.miumiu.gratic.data.remote.ws.CustomGsonMessageAdapter
+import com.miumiu.gratic.data.remote.ws.DrawingApi
+import com.miumiu.gratic.data.remote.ws.FlowStreamAdapter
 import com.miumiu.gratic.repository.DefaultSetupRepository
 import com.miumiu.gratic.repository.SetupRepository
 import com.miumiu.gratic.util.Constants.HTTP_BASE_URL
 import com.miumiu.gratic.util.Constants.HTTP_BASE_URL_LOCALHOST
+import com.miumiu.gratic.util.Constants.RECONNECT_INTERVAL
 import com.miumiu.gratic.util.Constants.USE_LOCALHOST
+import com.miumiu.gratic.util.Constants.WS_BASE_URL
+import com.miumiu.gratic.util.Constants.WS_BASE_URL_LOCALHOST
 import com.miumiu.gratic.util.DispatcherProvider
 import com.miumiu.gratic.util.clientId
 import com.miumiu.gratic.util.dataStore
+import com.tinder.scarlet.Scarlet
+import com.tinder.scarlet.lifecycle.android.AndroidLifecycle
+import com.tinder.scarlet.retry.LinearBackoffStrategy
+import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,6 +70,27 @@ object AppModule {
     @Provides
     fun provideClientId(@ApplicationContext context: Context): String {
         return runBlocking { context.dataStore.clientId() }
+    }
+
+    @Singleton
+    @Provides
+    fun provideDrawingApi(
+        app: Application,
+        okHttpClient: OkHttpClient,
+        gson: Gson
+    ): DrawingApi {
+        return Scarlet.Builder()
+            .backoffStrategy(LinearBackoffStrategy(RECONNECT_INTERVAL))
+            .lifecycle(AndroidLifecycle.ofApplicationForeground(app))
+            .webSocketFactory(
+                okHttpClient.newWebSocketFactory(
+                    if (USE_LOCALHOST) WS_BASE_URL_LOCALHOST else WS_BASE_URL
+                )
+            )
+            .addStreamAdapterFactory(FlowStreamAdapter.Factory)
+            .addMessageAdapterFactory(CustomGsonMessageAdapter.Factory(gson))
+            .build()
+            .create()
     }
 
     @Singleton
