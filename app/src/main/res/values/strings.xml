@@ -46,4 +46,5 @@
     <string name="search_for_rooms">Search for rooms…</string>
 
     <string name="username">Username</string>
+    <string name="error_connection_failed">connection failed</string>
 </resources>
