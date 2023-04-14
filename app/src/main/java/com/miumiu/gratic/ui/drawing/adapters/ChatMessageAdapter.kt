@@ -119,7 +119,7 @@ class ChatMessageAdapter(
                     val date = dateFormat.format(announcement.timestamp)
                     tvTime.text = date
 
-                    when (announcement.announcementType) {
+                    when (announcement.announcement) {
                         Announcement.TYPE_EVERYBODY_GUESSED_IT -> {
                             root.setBackgroundColor(Color.LTGRAY)
                             tvAnnouncement.setTextColor(Color.BLACK)

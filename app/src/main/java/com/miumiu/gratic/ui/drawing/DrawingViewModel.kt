@@ -47,6 +47,9 @@ class DrawingViewModel @Inject constructor(
         object UndoEvent : SocketEvent()
     }
 
+    private val _chat = MutableStateFlow<List<BaseModel>>(listOf())
+    val chat: StateFlow<List<BaseModel>> = _chat
+
     private val _selectedColorButtonId = MutableStateFlow(R.id.rbBlack)
     val selectedColorButtonId: StateFlow<Int> = _selectedColorButtonId
 
@@ -95,6 +98,14 @@ class DrawingViewModel @Inject constructor(
                         socketEventChannel.send(SocketEvent.DrawDataEvent(data))
                     }
 
+                    is ChatMessage -> {
+                        socketEventChannel.send(SocketEvent.ChatMessageEvent(data))
+                    }
+
+                    is Announcement -> {
+                        socketEventChannel.send(SocketEvent.AnnouncementEvent(data))
+                    }
+
                     is DrawAction -> {
                         when (data.action) {
                             ACTION_UNDO -> socketEventChannel.send(SocketEvent.UndoEvent)
@@ -105,6 +116,13 @@ class DrawingViewModel @Inject constructor(
                     is Ping -> sendBaseModel(Ping())
                 }
             }
+        }
+    }
+
+    fun sendChatMessage(message: ChatMessage) {
+        if(message.message.trim().isEmpty()) return
+        viewModelScope.launch(dispatchers.io) {
+            drawingApi.sendBaseModel(message)
         }
     }
 
