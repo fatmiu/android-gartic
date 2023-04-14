@@ -12,6 +12,10 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.navArgs
@@ -26,7 +30,6 @@ import com.miumiu.gratic.data.remote.ws.models.DrawAction
 import com.miumiu.gratic.data.remote.ws.models.GameError
 import com.miumiu.gratic.data.remote.ws.models.JoinRoomHandshake
 import com.miumiu.gratic.data.remote.ws.models.PlayerData
-import com.miumiu.gratic.data.remote.ws.models.PlayersList
 import com.miumiu.gratic.databinding.ActivityDrawingBinding
 import com.miumiu.gratic.ui.drawing.adapters.ChatMessageAdapter
 import com.miumiu.gratic.ui.drawing.adapters.PlayerAdapter
@@ -39,7 +42,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DrawingActivity : AppCompatActivity() {
+class DrawingActivity : AppCompatActivity(), LifecycleEventObserver {
 
     private lateinit var binding: ActivityDrawingBinding
 
@@ -64,6 +67,7 @@ class DrawingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityDrawingBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        lifecycle.addObserver(this)
         subscribeToUiStateUpdates()
         listenToConnectionEvents()
         listenToSocketEvents()
@@ -333,11 +337,15 @@ class DrawingActivity : AppCompatActivity() {
                                     drawData
                                 )
 
-                                MotionEvent.ACTION_UP -> binding.drawingView.releaseTouchExternally(
+                                MotionEvent.ACTION_UP -> binding.drawingView.releasedTouchExternally(
                                     drawData
                                 )
                             }
                         }
+                    }
+
+                    is DrawingViewModel.SocketEvent.RoundDrawInfoEvent -> {
+                        binding.drawingView.update(event.data)
                     }
 
                     is DrawingViewModel.SocketEvent.GameStateEvent -> {
@@ -445,5 +453,11 @@ class DrawingActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        if(event == Lifecycle.Event.ON_STOP) {
+            viewModel.disconnect()
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.miumiu.gratic.ui.drawing
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.google.gson.JsonParser
 import com.miumiu.data.models.BaseModel
 import com.miumiu.gratic.R
 import com.miumiu.gratic.data.remote.ws.DrawingApi
@@ -10,6 +11,7 @@ import com.miumiu.gratic.data.remote.ws.Room
 import com.miumiu.gratic.data.remote.ws.models.Announcement
 import com.miumiu.gratic.data.remote.ws.models.ChatMessage
 import com.miumiu.gratic.data.remote.ws.models.ChosenWord
+import com.miumiu.gratic.data.remote.ws.models.DisconnectRequest
 import com.miumiu.gratic.data.remote.ws.models.DrawAction
 import com.miumiu.gratic.data.remote.ws.models.DrawAction.Companion.ACTION_UNDO
 import com.miumiu.gratic.data.remote.ws.models.DrawData
@@ -22,6 +24,8 @@ import com.miumiu.gratic.data.remote.ws.models.PlayerData
 import com.miumiu.gratic.data.remote.ws.models.PlayersList
 import com.miumiu.gratic.data.remote.ws.models.RoundDrawInfo
 import com.miumiu.gratic.ui.views.DrawingView
+import com.miumiu.gratic.util.Constants.TYPE_DRAW_ACTION
+import com.miumiu.gratic.util.Constants.TYPE_DRAW_DATA
 import com.miumiu.gratic.util.CoroutineTimer
 import com.miumiu.gratic.util.DispatcherProvider
 import com.tinder.scarlet.WebSocket
@@ -51,7 +55,7 @@ class DrawingViewModel @Inject constructor(
         data class NewWordsEvent(val data: NewWords) : SocketEvent()
         data class ChosenWordEvent(val data: ChosenWord) : SocketEvent()
         data class GameErrorEvent(val data: GameError) : SocketEvent()
-        data class RoundDrawInfoEvent(val data: RoundDrawInfo) : SocketEvent()
+        data class RoundDrawInfoEvent(val data: List<BaseModel>) : SocketEvent()
         object UndoEvent : SocketEvent()
     }
 
@@ -150,6 +154,20 @@ class DrawingViewModel @Inject constructor(
                         socketEventChannel.send(SocketEvent.ChosenWordEvent(data))
                     }
 
+                    is RoundDrawInfo -> {
+                        val drawActions = mutableListOf<BaseModel>()
+                        data.data.forEach { drawAction ->
+                            val jsonObject = JsonParser.parseString(drawAction).asJsonObject
+                            val type = when(jsonObject.get("type").asString) {
+                                TYPE_DRAW_DATA -> DrawData::class.java
+                                TYPE_DRAW_ACTION -> DrawAction::class.java
+                                else -> BaseModel::class.java
+                            }
+                            drawActions.add(gson.fromJson(drawAction, type))
+                        }
+                        socketEventChannel.send(SocketEvent.RoundDrawInfoEvent(drawActions))
+                    }
+
                     is Announcement -> {
                         socketEventChannel.send(SocketEvent.AnnouncementEvent(data))
                     }
@@ -189,6 +207,10 @@ class DrawingViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun disconnect() {
+        sendBaseModel(DisconnectRequest())
     }
 
     fun chooseWord(word: String, roomName: String) {
