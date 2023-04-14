@@ -2,6 +2,7 @@ package com.miumiu.gratic.ui.drawing
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -128,6 +129,18 @@ class DrawingActivity : AppCompatActivity() {
         }
     }
 
+    private fun setColorGroupVisibility(isVisible: Boolean) {
+        binding.colorGroup.isVisible = isVisible
+        binding.ibUndo.isVisible = isVisible
+    }
+
+    private fun setMessageInputVisibility(isVisible: Boolean) {
+        binding.apply {
+            tilMessage.isVisible = isVisible
+            ibSend.isVisible = isVisible
+        }
+    }
+
     private fun selectColor(color: Int) {
         binding.drawingView.setColor(color)
         binding.drawingView.setThickness(Constants.DEFAULT_PAINT_THICKNESS)
@@ -201,6 +214,21 @@ class DrawingActivity : AppCompatActivity() {
                             viewModel.chooseWord(newWords[2], args.roomName)
                             viewModel.setChooseWordOverlayVisibility(false)
                         }
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.gameState.collect { gameState ->
+                    binding.apply {
+                        tvCurWord.text = gameState.word
+                        val isUserDrawing = gameState.drawingPlayer == args.username
+                        setColorGroupVisibility(isUserDrawing)
+                        setMessageInputVisibility(!isUserDrawing)
+                        drawingView.isUserDrawing = isUserDrawing
+                        ibMic.isVisible = !isUserDrawing
+                        drawingView.isEnabled = isUserDrawing
                     }
                 }
             }
@@ -291,6 +319,10 @@ class DrawingActivity : AppCompatActivity() {
                                 )
                             }
                         }
+                    }
+
+                    is DrawingViewModel.SocketEvent.GameStateEvent -> {
+                        binding.drawingView.clear()
                     }
 
                     is DrawingViewModel.SocketEvent.ChatMessageEvent -> {
