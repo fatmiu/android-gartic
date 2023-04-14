@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.miumiu.gratic.R
@@ -21,6 +22,7 @@ import com.miumiu.gratic.data.remote.ws.models.DrawAction
 import com.miumiu.gratic.data.remote.ws.models.GameError
 import com.miumiu.gratic.data.remote.ws.models.JoinRoomHandshake
 import com.miumiu.gratic.databinding.ActivityDrawingBinding
+import com.miumiu.gratic.ui.drawing.adapters.ChatMessageAdapter
 import com.miumiu.gratic.util.Constants
 import com.tinder.scarlet.WebSocket
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,6 +43,8 @@ class DrawingActivity : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var rvPlayers: RecyclerView
 
+    private lateinit var chatMessageAdapter: ChatMessageAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDrawingBinding.inflate(layoutInflater)
@@ -48,6 +52,7 @@ class DrawingActivity : AppCompatActivity() {
         subscribeToUiStateUpdates()
         listenToConnectionEvents()
         listenToSocketEvents()
+        setupRecyclerView()
 
         toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         toggle.syncState()
@@ -209,6 +214,12 @@ class DrawingActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun setupRecyclerView() = binding.rvChat.apply {
+        chatMessageAdapter = ChatMessageAdapter(args.username)
+        adapter = chatMessageAdapter
+        layoutManager = LinearLayoutManager(this@DrawingActivity)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
