@@ -1,4 +1,4 @@
-package com.miumiu.gratic.ui.create_room
+package com.miumiu.gratic.ui.setup.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

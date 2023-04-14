@@ -1,4 +1,4 @@
-package com.miumiu.gratic
+package com.miumiu.gratic.ui.setup
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

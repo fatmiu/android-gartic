@@ -1,4 +1,4 @@
-package com.miumiu.gratic.ui.username
+package com.miumiu.gratic.ui.setup.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.miumiu.gratic.R
 import com.miumiu.gratic.databinding.FragmentUsernameBinding
+import com.miumiu.gratic.ui.setup.viewmodels.UsernameViewModel
 import com.miumiu.gratic.util.Constants.MAX_USERNAME_LENGTH
 import com.miumiu.gratic.util.Constants.MIN_USERNAME_LENGTH
 import com.miumiu.gratic.util.hideKeyboard

@@ -1,4 +1,4 @@
-package com.miumiu.gratic.ui.create_room
+package com.miumiu.gratic.ui.setup.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,6 +17,7 @@ import androidx.navigation.fragment.navArgs
 import com.miumiu.gratic.R
 import com.miumiu.gratic.data.remote.ws.Room
 import com.miumiu.gratic.databinding.FragmentCreateRoomBinding
+import com.miumiu.gratic.ui.setup.viewmodels.CreateRoomViewModel
 import com.miumiu.gratic.util.Constants
 import com.miumiu.gratic.util.hideKeyboard
 import com.miumiu.gratic.util.navigateSafely

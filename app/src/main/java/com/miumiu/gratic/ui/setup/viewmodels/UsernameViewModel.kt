@@ -1,4 +1,4 @@
-package com.miumiu.gratic.ui.username
+package com.miumiu.gratic.ui.setup.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

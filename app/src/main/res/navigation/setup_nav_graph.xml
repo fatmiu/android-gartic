@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/usernameFragment"
-        android:name="com.miumiu.gratic.ui.username.UsernameFragment"
+        android:name="com.miumiu.gratic.ui.setup.fragments.UsernameFragment"
         android:label="UsernameFragment" >
         <action
             android:id="@+id/action_usernameFragment_to_selectRoomFragment"
@@ -14,7 +14,7 @@
     </fragment>
     <fragment
         android:id="@+id/selectRoomFragment"
-        android:name="com.miumiu.gratic.ui.select_room.SelectRoomFragment"
+        android:name="com.miumiu.gratic.ui.setup.fragments.SelectRoomFragment"
         android:label="SelectRoomFragment" >
         <action
             android:id="@+id/action_selectRoomFragment_to_createRoomFragment"
@@ -28,7 +28,7 @@
     </fragment>
     <fragment
         android:id="@+id/createRoomFragment"
-        android:name="com.miumiu.gratic.ui.create_room.CreateRoomFragment"
+        android:name="com.miumiu.gratic.ui.setup.fragments.CreateRoomFragment"
         android:label="CreateRoomFragment" >
         <action
             android:id="@+id/action_createRoomFragment_to_drawingActivity"

@@ -1,4 +1,4 @@
-package com.miumiu.gratic.ui.select_room.adapters
+package com.miumiu.gratic.ui.setup.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

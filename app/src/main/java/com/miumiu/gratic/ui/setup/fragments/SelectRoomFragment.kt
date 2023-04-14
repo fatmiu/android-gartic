@@ -1,4 +1,4 @@
-package com.miumiu.gratic.ui.select_room
+package com.miumiu.gratic.ui.setup.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,7 +16,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.miumiu.gratic.R
 import com.miumiu.gratic.databinding.FragmentSelectRoomBinding
-import com.miumiu.gratic.ui.select_room.adapters.RoomAdapter
+import com.miumiu.gratic.ui.setup.adapters.RoomAdapter
+import com.miumiu.gratic.ui.setup.viewmodels.SelectRoomViewModel
 import com.miumiu.gratic.util.Constants.SEARCH_DELAY
 import com.miumiu.gratic.util.navigateSafely
 import com.miumiu.gratic.util.snackbar
