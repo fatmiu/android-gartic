@@ -14,6 +14,7 @@ import com.miumiu.gratic.R
 import com.miumiu.gratic.databinding.FragmentUsernameBinding
 import com.miumiu.gratic.util.Constants.MAX_USERNAME_LENGTH
 import com.miumiu.gratic.util.Constants.MIN_USERNAME_LENGTH
+import com.miumiu.gratic.util.hideKeyboard
 import com.miumiu.gratic.util.navigateSafely
 import com.miumiu.gratic.util.snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,6 +47,7 @@ class UsernameFragment : Fragment() {
             viewModel.validateUsernameAndNavigateToSelectRoom(
                 binding.etUsername.text.toString()
             )
+            requireActivity().hideKeyboard(binding.root)
         }
     }
 

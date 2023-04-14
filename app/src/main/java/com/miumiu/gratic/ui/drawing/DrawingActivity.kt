@@ -26,6 +26,7 @@ import com.miumiu.gratic.data.remote.ws.models.JoinRoomHandshake
 import com.miumiu.gratic.databinding.ActivityDrawingBinding
 import com.miumiu.gratic.ui.drawing.adapters.ChatMessageAdapter
 import com.miumiu.gratic.util.Constants
+import com.miumiu.gratic.util.hideKeyboard
 import com.tinder.scarlet.WebSocket
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -99,6 +100,7 @@ class DrawingActivity : AppCompatActivity() {
                 )
             )
             binding.etMessage.text?.clear()
+            hideKeyboard(binding.root)
         }
 
         binding.ibUndo.setOnClickListener {

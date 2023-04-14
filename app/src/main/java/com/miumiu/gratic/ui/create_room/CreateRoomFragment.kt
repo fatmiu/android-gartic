@@ -18,6 +18,7 @@ import com.miumiu.gratic.R
 import com.miumiu.gratic.data.remote.ws.Room
 import com.miumiu.gratic.databinding.FragmentCreateRoomBinding
 import com.miumiu.gratic.util.Constants
+import com.miumiu.gratic.util.hideKeyboard
 import com.miumiu.gratic.util.navigateSafely
 import com.miumiu.gratic.util.snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,6 +58,7 @@ class CreateRoomFragment : Fragment() {
                     binding.tvMaxPersons.text.toString().toInt()
                 )
             )
+            requireActivity().hideKeyboard(binding.root)
         }
     }
 
