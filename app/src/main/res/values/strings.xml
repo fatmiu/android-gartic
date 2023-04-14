@@ -14,6 +14,11 @@
 
     <string name="default_room_size">4</string>
 
+    <string name="dialog_leave_message">This will disconnect you from the game.</string>
+    <string name="dialog_leave_no">no</string>
+    <string name="dialog_leave_title">Do you really want to close the app?</string>
+    <string name="dialog_yes">yes</string>
+
     <string name="error_connection_failed">connection failed</string>
     <string name="error_field_empty">The fields may not be empty</string>
     <string name="error_http">Something went wrong. Please try again later.</string>
@@ -32,7 +37,7 @@
 
     <string name="or">or</string>
 
-    <string name="player_is_drawing">%s is choosing a word...</string>
+    <string name="player_is_drawing">%s is choosing a word…</string>
 
     <string name="room_name">Room name</string>
     <string name="room_size">Room Size</string>
@@ -50,6 +55,6 @@
 
     <string name="username">Username</string>
 
-    <string name="waiting_for_players">Waiting for players...</string>
-    <string name="waiting_for_start">Waiting for start...</string>
+    <string name="waiting_for_players">Waiting for players…</string>
+    <string name="waiting_for_start">Waiting for start…</string>
 </resources>

@@ -13,9 +13,7 @@ import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.navArgs
@@ -31,6 +29,7 @@ import com.miumiu.gratic.data.remote.ws.models.GameError
 import com.miumiu.gratic.data.remote.ws.models.JoinRoomHandshake
 import com.miumiu.gratic.data.remote.ws.models.PlayerData
 import com.miumiu.gratic.databinding.ActivityDrawingBinding
+import com.miumiu.gratic.ui.dialogs.LeaveDialog
 import com.miumiu.gratic.ui.drawing.adapters.ChatMessageAdapter
 import com.miumiu.gratic.ui.drawing.adapters.PlayerAdapter
 import com.miumiu.gratic.util.Constants
@@ -72,6 +71,7 @@ class DrawingActivity : AppCompatActivity(), LifecycleEventObserver {
         listenToConnectionEvents()
         listenToSocketEvents()
         setupRecyclerView()
+//        registerOnBackPressed()
 
         toggle = ActionBarDrawerToggle(this, binding.root, R.string.open, R.string.close)
         toggle.syncState()
@@ -456,8 +456,17 @@ class DrawingActivity : AppCompatActivity(), LifecycleEventObserver {
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        if(event == Lifecycle.Event.ON_STOP) {
+        if (event == Lifecycle.Event.ON_STOP) {
             viewModel.disconnect()
         }
+    }
+
+    override fun onBackPressed() {
+        LeaveDialog().apply {
+            setPositiveClickListener {
+                viewModel.disconnect()
+                finish()
+            }
+        }.show(supportFragmentManager, null)
     }
 }
