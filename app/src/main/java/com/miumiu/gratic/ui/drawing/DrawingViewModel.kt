@@ -18,6 +18,8 @@ import com.miumiu.gratic.data.remote.ws.models.GameState
 import com.miumiu.gratic.data.remote.ws.models.NewWords
 import com.miumiu.gratic.data.remote.ws.models.PhaseChange
 import com.miumiu.gratic.data.remote.ws.models.Ping
+import com.miumiu.gratic.data.remote.ws.models.PlayerData
+import com.miumiu.gratic.data.remote.ws.models.PlayersList
 import com.miumiu.gratic.data.remote.ws.models.RoundDrawInfo
 import com.miumiu.gratic.ui.views.DrawingView
 import com.miumiu.gratic.util.CoroutineTimer
@@ -64,6 +66,9 @@ class DrawingViewModel @Inject constructor(
 
     private val _gameState = MutableStateFlow(GameState("", ""))
     val gameState: StateFlow<GameState> = _gameState
+
+    private val _players = MutableStateFlow<List<PlayerData>>(listOf())
+    val players: StateFlow<List<PlayerData>> = _players
 
     private val _newWords = MutableStateFlow(NewWords(listOf()))
     val newWords: StateFlow<NewWords> = _newWords
@@ -152,6 +157,10 @@ class DrawingViewModel @Inject constructor(
                     is GameState -> {
                         _gameState.value = data
                         socketEventChannel.send(SocketEvent.GameStateEvent(data))
+                    }
+
+                    is PlayersList -> {
+                        _players.value = data.players
                     }
 
                     is NewWords -> {

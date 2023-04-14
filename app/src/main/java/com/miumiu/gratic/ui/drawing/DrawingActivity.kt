@@ -2,7 +2,6 @@ package com.miumiu.gratic.ui.drawing
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -26,8 +25,11 @@ import com.miumiu.gratic.data.remote.ws.models.ChatMessage
 import com.miumiu.gratic.data.remote.ws.models.DrawAction
 import com.miumiu.gratic.data.remote.ws.models.GameError
 import com.miumiu.gratic.data.remote.ws.models.JoinRoomHandshake
+import com.miumiu.gratic.data.remote.ws.models.PlayerData
+import com.miumiu.gratic.data.remote.ws.models.PlayersList
 import com.miumiu.gratic.databinding.ActivityDrawingBinding
 import com.miumiu.gratic.ui.drawing.adapters.ChatMessageAdapter
+import com.miumiu.gratic.ui.drawing.adapters.PlayerAdapter
 import com.miumiu.gratic.util.Constants
 import com.miumiu.gratic.util.hideKeyboard
 import com.tinder.scarlet.WebSocket
@@ -50,9 +52,13 @@ class DrawingActivity : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var rvPlayers: RecyclerView
 
+    @Inject
+    lateinit var playerAdapter: PlayerAdapter
+
     private lateinit var chatMessageAdapter: ChatMessageAdapter
 
     private var updateChatJob: Job? = null
+    private var updatePlayersJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +80,11 @@ class DrawingActivity : AppCompatActivity() {
         val header = layoutInflater.inflate(R.layout.nav_drawer_header, binding.navView)
         rvPlayers = header.findViewById(R.id.rvPlayers)
         binding.root.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
+        rvPlayers.apply {
+            adapter = playerAdapter
+            layoutManager = LinearLayoutManager(this@DrawingActivity)
+        }
 
         binding.ibPlayers.setOnClickListener {
             binding.root.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
@@ -235,6 +246,14 @@ class DrawingActivity : AppCompatActivity() {
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.players.collect { players ->
+                    updatePlayersList(players)
+
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.phaseTime.collect { time ->
                     binding.roundTimerProgressBar.progress = time.toInt()
                     binding.tvRemainingTimeChooseWord.text = (time / 1000L).toString()
@@ -390,6 +409,13 @@ class DrawingActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         binding.rvChat.layoutManager?.onSaveInstanceState()
+    }
+
+    private fun updatePlayersList(players: List<PlayerData>) {
+        updatePlayersJob?.cancel()
+        updatePlayersJob = lifecycleScope.launch {
+            playerAdapter.updateDataset(players)
+        }
     }
 
     private fun updateChatMessageList(chat: List<BaseModel>) {
