@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.miumiu.data.models.BaseModel
 import com.miumiu.gratic.R
 import com.miumiu.gratic.data.remote.ws.DrawingApi
+import com.miumiu.gratic.data.remote.ws.Room
 import com.miumiu.gratic.data.remote.ws.models.Announcement
 import com.miumiu.gratic.data.remote.ws.models.ChatMessage
 import com.miumiu.gratic.data.remote.ws.models.ChosenWord
@@ -15,17 +16,22 @@ import com.miumiu.gratic.data.remote.ws.models.DrawData
 import com.miumiu.gratic.data.remote.ws.models.GameError
 import com.miumiu.gratic.data.remote.ws.models.GameState
 import com.miumiu.gratic.data.remote.ws.models.NewWords
+import com.miumiu.gratic.data.remote.ws.models.PhaseChange
 import com.miumiu.gratic.data.remote.ws.models.Ping
 import com.miumiu.gratic.data.remote.ws.models.RoundDrawInfo
+import com.miumiu.gratic.ui.views.DrawingView
+import com.miumiu.gratic.util.CoroutineTimer
 import com.miumiu.gratic.util.DispatcherProvider
 import com.tinder.scarlet.WebSocket
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.util.Stack
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,6 +52,15 @@ class DrawingViewModel @Inject constructor(
         data class RoundDrawInfoEvent(val data: RoundDrawInfo) : SocketEvent()
         object UndoEvent : SocketEvent()
     }
+
+    private val _pathData = MutableStateFlow(Stack<DrawingView.PathData>())
+    val pathData: StateFlow<Stack<DrawingView.PathData>> = _pathData
+
+    private val _phase = MutableStateFlow(PhaseChange(null, 0L, null))
+    val phase: StateFlow<PhaseChange> = _phase
+
+    private val _phaseTime = MutableStateFlow(0L)
+    val phaseTime: StateFlow<Long> = _phaseTime
 
     private val _newWords = MutableStateFlow(NewWords(listOf()))
     val newWords: StateFlow<NewWords> = _newWords
@@ -68,9 +83,27 @@ class DrawingViewModel @Inject constructor(
     private val socketEventChannel = Channel<SocketEvent>()
     val socketEvent = socketEventChannel.receiveAsFlow().flowOn(dispatchers.io)
 
+    private val timer = CoroutineTimer()
+    private var timerJob: Job? = null
+
     init {
         observeBaseModels()
         observeEvents()
+    }
+
+    private fun setTimer(duration: Long) {
+        timerJob?.cancel()
+        timerJob = timer.timeAndEmit(duration, viewModelScope) {
+            _phaseTime.value = it
+        }
+    }
+
+    fun cancelTimer() {
+        timerJob?.cancel()
+    }
+
+    fun setPathDate(stack: Stack<DrawingView.PathData>) {
+        _pathData.value = stack
     }
 
     fun setChooseWordOverlayVisibility(isVisible: Boolean) {
@@ -124,6 +157,16 @@ class DrawingViewModel @Inject constructor(
                         }
                     }
 
+                    is PhaseChange -> {
+                        data.phase?.let {
+                            _phase.value = data
+                        }
+                        _phaseTime.value = data.time
+                        if (data.phase != Room.Phase.WAITING_FOR_PLAYERS) {
+                            setTimer(data.time)
+                        }
+                    }
+
                     is GameError -> socketEventChannel.send(SocketEvent.GameErrorEvent(data))
                     is Ping -> sendBaseModel(Ping())
                 }
@@ -137,7 +180,7 @@ class DrawingViewModel @Inject constructor(
     }
 
     fun sendChatMessage(message: ChatMessage) {
-        if(message.message.trim().isEmpty()) return
+        if (message.message.trim().isEmpty()) return
         viewModelScope.launch(dispatchers.io) {
             drawingApi.sendBaseModel(message)
         }

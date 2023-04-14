@@ -1,5 +1,6 @@
 package com.miumiu.gratic.ui.drawing
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.miumiu.data.models.BaseModel
 import com.miumiu.gratic.R
+import com.miumiu.gratic.data.remote.ws.Room
 import com.miumiu.gratic.data.remote.ws.models.ChatMessage
 import com.miumiu.gratic.data.remote.ws.models.DrawAction
 import com.miumiu.gratic.data.remote.ws.models.GameError
@@ -103,6 +105,10 @@ class DrawingActivity : AppCompatActivity() {
             hideKeyboard(binding.root)
         }
 
+        binding.drawingView.setPathDataChangedListener {
+            viewModel.setPathDate(it)
+        }
+
         binding.ibUndo.setOnClickListener {
 
             if (binding.drawingView.isUserDrawing) {
@@ -176,7 +182,7 @@ class DrawingActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.newWords.collect {
                     val newWords = it.newWords
-                    if(newWords.isEmpty()) return@collect
+                    if (newWords.isEmpty()) return@collect
 
                     binding.apply {
                         btnFirstWord.text = newWords[0]
@@ -195,6 +201,69 @@ class DrawingActivity : AppCompatActivity() {
                             viewModel.chooseWord(newWords[2], args.roomName)
                             viewModel.setChooseWordOverlayVisibility(false)
                         }
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.phaseTime.collect { time ->
+                    binding.roundTimerProgressBar.progress = time.toInt()
+                    binding.tvRemainingTimeChooseWord.text = (time / 1000L).toString()
+
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.phase.collect { phase ->
+                    when (phase.phase) {
+                        Room.Phase.WAITING_FOR_PLAYERS -> {
+                            binding.tvCurWord.text = getString(R.string.waiting_for_players)
+                            viewModel.cancelTimer()
+                            viewModel.setConnectionProgressBarVisibility(false)
+                            binding.roundTimerProgressBar.progress =
+                                binding.roundTimerProgressBar.max
+                        }
+
+                        Room.Phase.WAITING_FOR_START -> {
+                            binding.roundTimerProgressBar.max = phase.time.toInt()
+                            binding.tvCurWord.text = getString(R.string.waiting_for_start)
+                        }
+
+                        Room.Phase.NEW_ROUND -> {
+                            phase.drawingPlayer?.let { player ->
+                                binding.tvCurWord.text =
+                                    getString(R.string.player_is_drawing, player)
+                            }
+                            binding.apply {
+                                drawingView.isEnabled = false
+                                drawingView.setColor(Color.BLACK)
+                                drawingView.setThickness(Constants.DEFAULT_PAINT_THICKNESS)
+                                roundTimerProgressBar.max = phase.time.toInt()
+                                val isUserDrawingPlayer = phase.drawingPlayer == args.username
+                                binding.chooseWordOverlay.isVisible = isUserDrawingPlayer
+                            }
+                        }
+
+                        Room.Phase.GAME_RUNNING -> {
+                            binding.chooseWordOverlay.isVisible = false
+                            binding.roundTimerProgressBar.max = phase.time.toInt()
+                        }
+
+                        Room.Phase.SHOW_WORD -> {
+                            binding.apply {
+                                if (drawingView.isDrawing) {
+                                    drawingView.finishOffDrawing()
+                                }
+                                drawingView.isEnabled = false
+                                drawingView.setColor(Color.BLACK)
+                                drawingView.setThickness(Constants.DEFAULT_PAINT_THICKNESS)
+                                roundTimerProgressBar.max = phase.time.toInt()
+                            }
+                        }
+
+                        else -> Unit
                     }
                 }
             }
