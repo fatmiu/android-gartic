@@ -64,6 +64,10 @@ class DrawingView @JvmOverloads constructor(
         onDrawListener = listener
     }
 
+    fun setPaths(pathData: Stack<PathData>) {
+        this.paths = pathData
+    }
+
     fun setPathDataChangedListener(listener: (Stack<PathData>) -> Unit) {
         pathDataChangedListener = listener
     }
@@ -72,12 +76,13 @@ class DrawingView @JvmOverloads constructor(
         drawActions.forEach { drawAction ->
             when (drawAction) {
                 is DrawData -> {
-                    when(drawAction.motionEvent) {
+                    when (drawAction.motionEvent) {
                         ACTION_DOWN -> startedTouchExternally(drawAction)
                         ACTION_MOVE -> movedTouchExternally(drawAction)
                         ACTION_UP -> releasedTouchExternally(drawAction)
                     }
                 }
+
                 is DrawAction -> {
                     when (drawAction.action) {
                         ACTION_UNDO -> undo()
